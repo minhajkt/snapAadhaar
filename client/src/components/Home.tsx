@@ -1,42 +1,46 @@
-import { Box, Button, Paper, Stack, Typography } from "@mui/material"
+import { Box, Button, Paper, Stack, Typography, Snackbar } from "@mui/material";
 import { useState } from "react";
-import axios from "axios";
 import AadhaarData from "./AadhaarData";
 import InputFileUpload from "./UploadButton";
-import CircularProgress from '@mui/joy/CircularProgress';
-
+import CircularProgress from "@mui/joy/CircularProgress";
+import { uploadAadhaarImages } from "../service/upload";
 
 const Home = () => {
   const [frontFile, setFrontFile] = useState<File | null>(null);
   const [backFile, setBackFile] = useState<File | null>(null);
   const [ocrResult, setOcrResult] = useState(null);
   const [processing, setProcessing] = useState(false);
-
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const [snackbar, setSnackbar] = useState(false);
+  const [error, setError] = useState("");
 
   const handle = async () => {
     if (!frontFile || !backFile) {
-    //   console.log("hello");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("front", frontFile);
-    formData.append("back", backFile);
-
     try {
       setProcessing(true);
-      const res = await axios.post(
-        apiUrl,
-        formData
-      );
-      setOcrResult(res.data);
-    //   console.log("result of ocr", res.data);
-    } catch (error) {
+      setOcrResult(null);
+      setError("");
+      const res = await uploadAadhaarImages(frontFile, backFile);
+      setOcrResult(res);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error || "Something went wrong";
+      setError(errorMessage);
+      setSnackbar(true);
       console.error("Error processing ocr", error);
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleClear = () => {
+    setFrontFile(null);
+    setBackFile(null);
+    setOcrResult(null);
+    setError("");
   };
 
   return (
@@ -66,6 +70,7 @@ const Home = () => {
           flexDirection: { xs: "column", md: "row" },
           gap: 2,
           height: { md: "100%" },
+          // alignItems:'center'
         }}
       >
         <Stack
@@ -122,6 +127,14 @@ const Home = () => {
           >
             {processing ? "Processing..." : "Process"}
           </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            onClick={handleClear}
+          >
+            Clear
+          </Button>
         </Stack>
 
         <Box
@@ -142,8 +155,16 @@ const Home = () => {
           )}
         </Box>
       </Box>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbar}
+        onClose={() => setSnackbar(false)}
+        autoHideDuration={3000}
+        message={error || "Please add a aadhaar"}
+      />
     </Box>
   );
 };
 
-export default Home
+export default Home;
