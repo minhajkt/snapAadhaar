@@ -8,16 +8,16 @@ export class OcrService implements IOcrService {
   async processImage(imageBuffer: Buffer): Promise<any> {
     try {
       const result = await Tesseract.recognize(imageBuffer, "eng+mal");
-      const confidence = result.data.confidence
+      // const confidence = result.data.confidence
       // console.log('confidence', confidence)
-      if(confidence < 50) {
-        throw new Error('Image too unclear to read');
-      }
+      // if(confidence < 50) {
+      //   throw new Error('Image too unclear to read');
+      // }
       const extracted = extractDetails(result.data.text);
       return extracted;
     } catch (error) {
       console.error("OCR processing error:", error);
-      throw new Error("OCR Process Failed");
+      throw error
     }
   }
 
