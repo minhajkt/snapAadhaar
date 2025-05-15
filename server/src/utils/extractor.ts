@@ -1,12 +1,13 @@
+import { REGEX } from "../constants/regex";
 import { cleanAddress } from "./cleaner";
 
 export function extractDetails(text: string) {
-  const nameMatch = text.match(/(?<=\n)[A-Za-z\s]+(?=\n)/);
-  const dobMatch = text.match(/\b(\d{2}\/\d{2}\/\d{4})\b/);
-  const genderMatch = text.match(/\b(Male|Female|Other)\b/i);
-  const aadhaarMatch = text.match(/\d{4}\s\d{4}\s\d{4}/);
+  const nameMatch = text.match(REGEX.NAME);
+  const dobMatch = text.match(REGEX.DOB);
+  const genderMatch = text.match(REGEX.GENDER);
+  const aadhaarMatch = text.match(REGEX.AADHAAR_NUMBER);
   const addressMatch = text.match(
-    /(?:Address|Add|Addr)[\s:]+([\s\S]*?)(?=\n\d{4}|\n{2,}|$)/i
+    REGEX.ADDRESS
   );
 
   return {

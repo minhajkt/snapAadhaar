@@ -1,6 +1,7 @@
 import Tesseract from "tesseract.js";
 import { IOcrService } from "./IOcrService";
 import { extractDetails  } from "../utils/extractor";
+import { MESSAGES } from "../constants/messages";
 
 
 
@@ -8,15 +9,10 @@ export class OcrService implements IOcrService {
   async processImage(imageBuffer: Buffer): Promise<any> {
     try {
       const result = await Tesseract.recognize(imageBuffer, "eng+mal");
-      // const confidence = result.data.confidence
-      // console.log('confidence', confidence)
-      // if(confidence < 50) {
-      //   throw new Error('Image too unclear to read');
-      // }
       const extracted = extractDetails(result.data.text);
       return extracted;
     } catch (error) {
-      console.error("OCR processing error:", error);
+      // console.error("OCR processing error:", error);
       throw error
     }
   }
@@ -25,11 +21,11 @@ export class OcrService implements IOcrService {
     try {
       const frontText = await this.processImage(frontBuffer);
       if(!frontText.aadhaarNumber) {
-        throw new Error('Please add a Aadhaar image to process')
+        throw new Error(MESSAGES.ADD_PROPERIMAGE)
       }
       const backText = await this.processImage(backBuffer);
       if(!backText.address) {
-        throw new Error("Please add a Aadhaar image to process");
+        throw new Error(MESSAGES.ADD_PROPERIMAGE);
       }
 
       return {
@@ -40,7 +36,7 @@ export class OcrService implements IOcrService {
         address: backText.address,
       };
     } catch (error) {
-      console.error("Error in processing and merging OCR data:", error);
+      // console.error("Error in processing and merging OCR data:", error);
       throw error
     }
   }

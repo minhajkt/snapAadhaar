@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { IOcrService } from "../services/IOcrService";
+import { HttpStatus } from "../constants/httpStatus";
+import { MESSAGES } from "../constants/messages";
 
 export class OcrController {
   private ocrService: IOcrService;
@@ -13,7 +15,7 @@ export class OcrController {
     };
 
     if (!front || !back) {
-      res.status(400).send("Both front and back are required");
+      res.status(HttpStatus.BAD_REQUEST).send(MESSAGES.FRONTANDBACK);
     }
 
     try {
@@ -25,7 +27,7 @@ export class OcrController {
       res.json(data);
     } catch (error: any) {
       const message =
-        error instanceof Error ? error.message : "OCR processing failed";
+        error instanceof Error ? error.message : MESSAGES.OCR_FAILED;
       res.status(400).json({ error: message });
     }
   }

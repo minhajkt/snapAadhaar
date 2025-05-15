@@ -1,17 +1,18 @@
+import { REGEX } from "../constants/regex";
 
 export function cleanAddress(raw: string): string {
-    const englishOnly = raw.replace(/[\u0D00-\u0D7F]+/g, "");
+    const englishOnly = raw.replace(REGEX.LANGUAGE, "");
 
 
   let cleaned = englishOnly
-    .replace(/[^\w\s,.:/-]/g, "") 
-    .replace(/\s{2,}/g, " ")  
-    .replace(/\n/g, ", ") 
-    .replace(/,\s*,/g, ",") 
-    .replace(/,\s*$/, "")  
+    .replace(REGEX.SPECIAL_CHAR, "") 
+    .replace(REGEX.MULTIPLE_SPACE, " ")  
+    .replace(REGEX.NEW_LINE, ", ") 
+    .replace(REGEX.MULTIPLE_COMMA, ",") 
+    .replace(REGEX.TRAILING_COMMA, "")  
     .trim();
 
-    cleaned = cleaned.replace(/^[^A-Za-z]+/, "");
+    cleaned = cleaned.replace(REGEX.NON_LETTERS, "");
 
     return cleaned
 }
